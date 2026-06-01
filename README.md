@@ -1,58 +1,68 @@
 # srvcs-pi
 
-A floating-point **constant** microservice for srvcs.cloud.
+## Name
 
-- **Concern:** `constant: pi`
-- **Depends on:** nothing (leaf constant)
-- **Result type:** `f64` (a JSON number with a fractional part)
+| Field | Value |
+| --- | --- |
+| Service | `srvcs-pi` |
+| Slug | `pi` |
+| Repository | `srvcs/pi` |
+| Package | `srvcs-pi` |
+| Kind | `constant` |
 
-It returns the mathematical constant pi: `std::f64::consts::PI`
-(`3.141592653589793`). It has no dependencies, performs no input validation, and
-calls no other service.
+## Function
+
+constant: pi
+
+## Dependencies
+
+None.
 
 ## API
 
-### `GET /`
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/` | Service identity |
+| `POST` | `/` | Evaluate the service function |
+| `GET` | `/healthz` | Liveness probe |
+| `GET` | `/readyz` | Readiness probe |
+| `GET` | `/metrics` | Prometheus metrics |
+| `GET` | `/openapi.json` | OpenAPI document |
 
-Service identity.
+## Inputs
 
-```json
-{ "service": "srvcs-pi", "concern": "constant: pi", "depends_on": [] }
-```
+This service accepts an empty or ignored request body.
 
-### `POST /`
+## Outputs
 
-Returns the constant. The request body is **ignored** — it may be empty, absent,
-`{}`, or any JSON value.
+| Name | Type |
+| --- | --- |
+| `result` | `number` |
 
-```sh
-curl -s -X POST localhost:8080/ -H 'content-type: application/json' -d '{}'
-```
+## Configuration
 
-```json
-{ "result": 3.141592653589793 }
-```
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `SRVCS_BIND_ADDR` | `0.0.0.0:8080` | Bind address |
+| `SRVCS_ENV` | `development` | Environment label for logs |
+| `RUST_LOG` | `info,tower_http=info` | Tracing filter |
 
-`result` is an `f64`. Compare it approximately (`|got - expected| < 1e-9`),
-never with exact float equality.
+## Error Behavior
 
-### Standard endpoints
+- `422` means the request could not be evaluated for the documented input shape.
+- `503` means a required dependency was unavailable or returned an unexpected response.
+- Dependency validation errors are forwarded when this service delegates validation.
 
-`GET /healthz`, `GET /readyz`, `GET /metrics`, `GET /openapi.json`.
-
-## Local checks
-
-```sh
-nix flake check -L
-nix develop -c sh -euc 'cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test'
-nix build .#default -L
-```
-
-If the OpenAPI snapshot drifts, regenerate it:
+## Local Checks
 
 ```sh
-UPDATE_OPENAPI=1 cargo test --test openapi_snapshot
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
 ```
 
-See [`srvcs/platform`](https://github.com/srvcs/platform) for the shared service
-standard and CI workflow.
+See the [srvcs service standard](https://github.com/srvcs/platform/blob/main/STANDARD.md) for the full operational contract.
+
+## Metadata
+
+Machine-readable service metadata lives in `srvcs.yaml`. Keep it aligned with this README when the service contract changes.
