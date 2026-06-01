@@ -32,16 +32,6 @@
         "tags": [],
         "summary": "`POST /` — return the constant pi. The request body is ignored; it may be\nempty, absent, or any JSON value.",
         "operationId": "evaluate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EvalRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "",
@@ -71,10 +61,6 @@
             "description": "The value of pi."
           }
         }
-      },
-      "EvalRequest": {
-        "type": "object",
-        "description": "Request body for `POST /`. A constant service takes no arguments, so any\nJSON body is accepted and ignored. Modelled as an arbitrary object so the\nOpenAPI document advertises that the body carries no required fields."
       },
       "Info": {
         "type": "object",

@@ -14,6 +14,9 @@
 
 constant: pi
 
+This is a zero-argument constant. `POST /` returns pi in the `result` field;
+any request body is ignored.
+
 ## Dependencies
 
 None.
@@ -49,9 +52,8 @@ This service accepts an empty or ignored request body.
 
 ## Error Behavior
 
-- `422` means the request could not be evaluated for the documented input shape.
-- `503` means a required dependency was unavailable or returned an unexpected response.
-- Dependency validation errors are forwarded when this service delegates validation.
+This constant service has no input fields and no dependencies, so normal
+evaluation returns `200`.
 
 ## Local Checks
 

@@ -1,6 +1,6 @@
 use axum::{response::IntoResponse, Json};
-use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde::Serialize;
+use serde_json::json;
 use utoipa::{OpenApi, ToSchema};
 
 /// This service's identity. `srvcs-pi` is a zero-argument constant: it depends
@@ -27,13 +27,6 @@ pub async fn index() -> Json<Info> {
     })
 }
 
-/// Request body for `POST /`. A constant service takes no arguments, so any
-/// JSON body is accepted and ignored. Modelled as an arbitrary object so the
-/// OpenAPI document advertises that the body carries no required fields.
-#[derive(Deserialize, ToSchema)]
-#[schema(value_type = Object)]
-pub struct EvalRequest(#[serde(default)] pub Value);
-
 #[derive(Serialize, ToSchema)]
 pub struct ConstantResponse {
     /// The value of pi.
@@ -50,18 +43,14 @@ pub fn pi() -> f64 {
 #[utoipa::path(
     post,
     path = "/",
-    request_body = EvalRequest,
     responses((status = 200, body = ConstantResponse))
 )]
-pub async fn evaluate(_req: Option<Json<EvalRequest>>) -> impl IntoResponse {
+pub async fn evaluate() -> impl IntoResponse {
     Json(json!({ "result": pi() }))
 }
 
 #[derive(OpenApi)]
-#[openapi(
-    paths(index, evaluate),
-    components(schemas(Info, EvalRequest, ConstantResponse))
-)]
+#[openapi(paths(index, evaluate), components(schemas(Info, ConstantResponse)))]
 pub struct ApiDoc;
 
 /// Serve OpenAPI document
